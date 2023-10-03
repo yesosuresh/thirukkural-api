@@ -1,0 +1,149 @@
+openapi: 3.0.3
+info:
+  title: Thirukkural API - OpenAPI 3.0
+  description: |-
+    Thirukkural API is a simple quotes service. The original Thirukkural is a collection of 1330 Tamil couplets that discuss various aspects of life. The service provides Thirukkural in native Tamil language with English translations. The API allows users to send queries to fetch kurals based on a number of specified parameters including the number of the kural to return.
+    
+    Some useful links:
+    - [The source API definition for the Thirukkural API](https://github.com/yesosuresh/thirukkural-api/blob/main/openapi.yaml)
+  termsOfService: https://getthirukkural.appspot.com/#contact
+  contact:
+    email: getkural@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: Find out more about Thirukkural API
+  url: https://getthirukural.appspot.com
+servers:
+  - url: https://getthirukural.appspot.com/api/3.0
+tags:
+  - name: kural
+    description: Retrieve a Kural
+    externalDocs:
+      description: Find out more
+      url: https://getthirukkural.appspot.com/#api
+  
+paths:
+  /kural/{number}:
+    get:
+      tags:
+        - kural
+      summary: Find Thirukkural by Number
+      description: Returns a Thirukkural
+      operationId: getKuralByNumber
+      parameters:
+        - name: number
+          in: path
+          description: Number of a Thirukkural to return or 'rnd' for random Thirukkural
+          required: true
+          schema:
+            type: string
+            format: int64
+        - name: format
+          in: query
+          description: The optional parameter format is used to specify a response format, either “xml” or “json”. Default json.
+          required: false
+          explode: true
+          schema:
+            type: string
+            default: json
+            enum:
+              - json
+              - xml
+           
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Kural'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Kural'
+        '400':
+          description: Invalid ID supplied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: Thirukkural not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      security:
+        - api_key: []
+    
+  
+components:
+  schemas:
+    Kural:
+      type: object
+      properties:
+        paal:
+          type: string
+        iyal:
+          type: string
+        athigaram:
+          type: string
+        number:
+          type: integer
+          format: int64
+          example: 1
+        line1:
+          type: string
+          description: First line of Thirukkural
+        line2:
+          type: string
+          description: Second and Last line of Thirukkural
+        translation:
+          type: string
+          description: English translantion of Thirukkural
+        urai1:
+          type: string
+          description: First Tamil explanation of Thirukkural
+        urai1Author:
+          type: string
+          description: First Tamil explanation Author
+        urai2:
+          type: string
+          description: Second Tamil explanation of Thirukkural
+        urai2Author:
+          type: string
+          description: Second Tamil explanation Author
+        urai3:
+          type: string
+          description: Third Tamil explanation of Thirukkural
+        urai3Author:
+          type: string
+          description: Third Tamil explanation Author
+      xml:
+        name: HashMap
+ 
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: IXL:01
+        message:
+          type: string
+          example: Invalid Application Key
+      xml:
+        name: 'error'
+
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: appid
+      in: query
